@@ -414,18 +414,31 @@
     const preview = panel.closest('.demo-group').querySelector('.preview');
     
     
-    // Initialize color pickers
-    panel.querySelectorAll('.color-picker').forEach(input => {
-      const prop = input.dataset.prop;
-      let val = getComputedStyle(preview).getPropertyValue(prop).trim();
-      if (val.startsWith('rgb')) val = rgbToHex(val);
-      input.value = val;
-    });
-    panel.querySelectorAll('input, select').forEach(input => {
-      input.addEventListener('input', () => {
-        const prop = input.dataset.prop;
-        const unit = input.dataset.unit || '';
-        preview.style.setProperty(prop, input.value + unit);
+    // Initialize each control to match computed style
+      panel.querySelectorAll('input[data-prop], select[data-prop]').forEach(control => {
+        const prop = control.dataset.prop;
+        let computed = getComputedStyle(preview).getPropertyValue(prop).trim();
+
+        if (control.type === 'color') {
+          if (computed.startsWith('rgb')) computed = rgbToHex(computed);
+          control.value = computed;
+        } else if (control.tagName.toLowerCase() === 'select') {
+          control.value = computed;
+        } else if (control.type === 'range') {
+          const num = parseFloat(computed);
+          control.value = isNaN(num) ? control.value : num;
+          // update corresponding output element
+          const output = panel.querySelector(`#${control.dataset.prop}Val, output[for='${control.dataset.prop}']`);
+          if (output) output.value = control.value;
+        }
+      });
+
+      // Listen for changes and update preview
+      panel.querySelectorAll('input[data-prop], select[data-prop]').forEach(input => {
+        input.addEventListener('input', () => {
+          const prop = input.dataset.prop;
+          const unit = input.dataset.unit || '';
+          preview.style.setProperty(prop, input.value + unit);
       });
     });
   });
