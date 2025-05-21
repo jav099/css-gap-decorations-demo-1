@@ -186,9 +186,12 @@
       CSS Gaps Decorations Module Level 1</a>.
       Use the controls to tweak gap, rule, and paint-order properties in real time
       and see how they affect multicolumn, flex, and grid layouts.
-      This is a non-exhaustive demo. See the spec for full details on the properties and their values.
-
-      Keep in mind that as of right now, this is only implemented for Chromium-based browsers, and a flag is needed to enable the feature: --enable-features=CSSGapDecoration
+    </p>
+    <p>
+       This is a non-exhaustive demo. See the spec for full details on the properties and their values.
+    </p>
+    <p>
+      As of right now, this is only implemented for Chromium-based browsers, and a flag is needed to enable the feature: --enable-features=CSSGapDecoration
     </p>
     <p><strong>Contacts:</strong><br/>
       Kevin Babbit, <a href="mailto:kbabbitt@microsoft.com">kbabbitt@microsoft.com</a><br/>
@@ -215,7 +218,7 @@
           <option value="dotted">dotted</option>
         </select>
         <label>Row-rule-color:</label>
-        <input type="color" data-prop="row-rule-color" value="#888888" />
+        <input type="color" class="color-picker" data-prop="row-rule-color" value="#888888" />
         <label>Row-rule-break:</label>
         <select data-prop="row-rule-break">
           <option value="none">none</option>
@@ -233,7 +236,7 @@
           <option value="dotted">dotted</option>
         </select>
         <label>Column-rule-color:</label>
-        <input type="color" data-prop="column-rule-color" value="#888888" />
+        <input type="color" class="color-picker" data-prop="column-rule-color" value="#888888" />
         <label>Column-rule-break:</label>
         <select data-prop="column-rule-break">
           <option value="none">none</option>
@@ -279,7 +282,7 @@
           <option value="dotted">dotted</option>
         </select>
         <label>Row-rule-color:</label>
-        <input type="color" data-prop="row-rule-color" value="#888888" />
+        <input type="color" class="color-picker" data-prop="row-rule-color" value="#888888" />
         <label>Column-rule-width (px): <output id="fxColRuleWVal">4</output></label>
         <input type="range" min="0" max="20" value="4" data-prop="column-rule-width" data-unit="px" oninput="fxColRuleWVal.value=this.value"/>
         <label>Column-rule-outset (px): <output id="fxColRuleOVal">0</output></label>
@@ -291,7 +294,7 @@
           <option value="dotted">dotted</option>
         </select>
         <label>Column-rule-color:</label>
-        <input type="color" data-prop="column-rule-color" value="#888888" />
+        <input type="color" class="color-picker" data-prop="column-rule-color" value="#888888" />
         <label>Row-rule-break:</label>
         <select data-prop="row-rule-break">
           <option value="none">none</option>
@@ -338,7 +341,7 @@
           <option value="dotted">dotted</option>
         </select>
         <label>Column-rule-color:</label>
-        <input type="color" data-prop="column-rule-color" value="#888888" />
+        <input type="color" class="color-picker" data-prop="column-rule-color" value="#888888" />
         <label>Column-rule-break:</label>
         <select data-prop="column-rule-break">
           <option value="none">none</option>
@@ -356,7 +359,7 @@
           <option value="dotted">dotted</option>
         </select>
         <label>Row-rule-color:</label>
-        <input type="color" data-prop="row-rule-color" value="#888888" />
+        <input type="color" class="color-picker" data-prop="row-rule-color" value="#888888" />
         <label>Row-rule-style:</label>
         <select data-prop="row-rule-style">
           <option value="solid">solid</option>
@@ -364,7 +367,7 @@
           <option value="dotted">dotted</option>
         </select>
         <label>Row-rule-color:</label>
-        <input type="color" data-prop="row-rule-color" value="#888888" />
+        <input type="color" class="color-picker" data-prop="row-rule-color" value="#888888" />
         <label>Row-rule-break:</label>
         <select data-prop="row-rule-break">
           <option value="none">none</option>
@@ -400,8 +403,24 @@
   <footer>Demo of CSS Gap Decorations Module Level 1 • Built by Your Name</footer>
 
 <script>
+
+  // helper to convert “rgb(r, g, b)” → “#rrggbb”
+  function rgbToHex(rgb) {
+    const [r, g, b] = rgb.match(/\d+/g).map(n => parseInt(n));
+    return '#' + [r, g, b].map(v => v.toString(16).padStart(2, '0')).join('');
+  }
+
   document.querySelectorAll('.controls').forEach(panel => {
     const preview = panel.closest('.demo-group').querySelector('.preview');
+    
+    
+    // Initialize color pickers
+    panel.querySelectorAll('.color-picker').forEach(input => {
+      const prop = input.dataset.prop;
+      let val = getComputedStyle(preview).getPropertyValue(prop).trim();
+      if (val.startsWith('rgb')) val = rgbToHex(val);
+      input.value = val;
+    });
     panel.querySelectorAll('input, select').forEach(input => {
       input.addEventListener('input', () => {
         const prop = input.dataset.prop;
